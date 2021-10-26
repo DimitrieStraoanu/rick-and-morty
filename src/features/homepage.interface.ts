@@ -1,4 +1,4 @@
-import { ICharacter } from './character.interface'
+import { ICharacter } from './characterPage.interface'
 
 interface IPagination {
   count?: number

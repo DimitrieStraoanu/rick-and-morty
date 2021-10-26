@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { CharacterStatus } from './character.interface'
+import { CharacterStatus } from './characterPage.interface'
 import { IHomepageInitialState } from './homepage.interface'
 
-const name = 'homepage'
+const namespace = 'homepage'
 
 const initialState: IHomepageInitialState = {
   charactersList: [],
@@ -11,16 +11,16 @@ const initialState: IHomepageInitialState = {
 }
 
 interface IFetchCharactersData {
-  name?: string
-  status?: CharacterStatus
+  searchQuery?: string
+  characterStatus?: CharacterStatus
 }
 
 export const fetchCharacters = createAsyncThunk(
-  `${name}/fetchCharacters`,
+  `${namespace}/fetchCharacters`,
   async (data?: IFetchCharactersData) => {
     const response = await fetch(
-      `https://rickandmortyapi.com/api/character?name=${data ? data.name : ''}&status=${
-        data ? data.status : ''
+      `https://rickandmortyapi.com/api/character?name=${data ? data.searchQuery : ''}&status=${
+        data ? data.characterStatus : ''
       }`
     )
     if (response.ok) return await response.json()
@@ -29,9 +29,15 @@ export const fetchCharacters = createAsyncThunk(
 )
 
 const homepage = createSlice({
-  name,
+  name: namespace,
   initialState,
-  reducers: {},
+  reducers: {
+    resetHomepageState: (state) => {
+      state.charactersList = initialState.charactersList
+      state.loading = initialState.loading
+      state.pagination = initialState.pagination
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCharacters.fulfilled, (state, action) => {
@@ -45,8 +51,10 @@ const homepage = createSlice({
       })
       .addCase(fetchCharacters.rejected, (state, action) => {
         state.loading = false
+        state.charactersList = []
       })
   },
 })
 
+export const { resetHomepageState } = homepage.actions
 export default homepage.reducer

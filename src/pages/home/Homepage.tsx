@@ -2,9 +2,12 @@ import { useAppDispatch, useAppSelector } from 'app/hooks'
 import React from 'react'
 import SearchBar from 'components/SearchBar'
 import StatusSelector from 'components/StatusSelector'
-import { CharacterStatus } from 'features/character.interface'
-import { fetchCharacters } from 'features/homepage.slice'
+import { CharacterStatus } from 'features/characterPage.interface'
+import { fetchCharacters, resetHomepageState } from 'features/homepage.slice'
 import { useHistory } from 'react-router'
+import Character from 'components/Character'
+import { CharactersContainer, Container, FiltersContainer, PageBackground } from './Homepage.styles'
+import homepageBg from 'assets/images/homepageBg.jpg'
 
 const Homepage = () => {
   const history = useHistory()
@@ -20,7 +23,14 @@ const Homepage = () => {
   }, [])
 
   React.useEffect(() => {
-    dispatch(fetchCharacters({ name: searchQuery, status: characterStatus }))
+    dispatch(resetHomepageState())
+    return () => {
+      dispatch(resetHomepageState())
+    }
+  }, [dispatch])
+
+  React.useEffect(() => {
+    dispatch(fetchCharacters({ searchQuery, characterStatus }))
   }, [dispatch, searchQuery, characterStatus])
 
   const handleSearch = (value: string): void => {
@@ -34,15 +44,25 @@ const Homepage = () => {
   }
 
   return (
-    <div>
-      <SearchBar onChange={(value) => handleSearch(value)} />
-      <StatusSelector onChange={(value) => setCharacterStatus(value as CharacterStatus)} />
-      {charactersList.map((character) => (
-        <div key={character.id} onClick={handleClick(character.id)}>
-          {character.name}
-        </div>
-      ))}
-    </div>
+    <PageBackground url={homepageBg}>
+      <Container>
+        <FiltersContainer>
+          <div>
+            <SearchBar onChange={(value) => handleSearch(value)} />
+            <StatusSelector onChange={(value) => setCharacterStatus(value as CharacterStatus)} />
+          </div>
+        </FiltersContainer>
+        <CharactersContainer>
+          {charactersList.map((character) => (
+            <Character
+              key={character.id}
+              character={character}
+              onClick={handleClick(character.id)}
+            />
+          ))}
+        </CharactersContainer>
+      </Container>
+    </PageBackground>
   )
 }
 
