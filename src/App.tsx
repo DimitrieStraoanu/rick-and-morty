@@ -12,7 +12,7 @@ const App: React.FC = () => (
     <Router>
       <Switch>
         <Route exact path={'/'} component={Homepage} />
-        <Route exact path={'/character:id'} component={CharacterPage} />
+        <Route exact path={'/character/:id'} component={CharacterPage} />
       </Switch>
     </Router>
   </ThemeProvider>
