@@ -6,16 +6,20 @@ export const Container = styled.div`
   background: black;
   position: fixed;
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+
+  svg {
+    padding: 15px;
+    width: 400px;
+  }
 
   ${media('md')} {
     height: 250px;
+    svg {
+      width: 600px;
+    }
   }
-`
-
-export const Logo = styled.img`
-  object-fit: contain;
-  width: 100%;
-  height: 100%;
-  padding: 30px;
-  margin: 0 auto;
 `

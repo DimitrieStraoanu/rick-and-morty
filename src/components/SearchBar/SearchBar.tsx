@@ -3,15 +3,17 @@ import { StyledInput } from './SearchBar.styles'
 
 interface ISearchBarProps {
   onChange: (value: string) => void
+  value: string
 }
 
 const SearchBar: React.FC<ISearchBarProps> = (props) => {
-  const { onChange } = props
+  const { onChange, value } = props
 
   return (
     <StyledInput
+      value={value}
       onChange={(e) => onChange(e.target.value)}
-      placeholder={'Search characters'}
+      placeholder={'Search for characters'}
     ></StyledInput>
   )
 }

@@ -10,8 +10,10 @@ interface ICharacterProps {
 const Character: React.FC<ICharacterProps> = (props) => {
   const { character, onClick } = props
   return (
-    <Container onClick={onClick}>
-      <img src={character.image} alt={character.name} />
+    <Container className={character.status} onClick={onClick}>
+      <div>
+        <img src={character.image} alt={character.name} />
+      </div>
       <div>
         <span>{character.name}</span>
         <span>{character.status}</span>

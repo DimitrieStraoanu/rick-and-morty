@@ -1,4 +1,5 @@
 import { useAppDispatch, useAppSelector } from 'app/hooks'
+import PageBackground from 'components/PageBackground'
 import {
   fetchCharacterById,
   fetchEpisodes,
@@ -6,6 +7,10 @@ import {
 } from 'features/characterPage.slice'
 import React from 'react'
 import { useParams } from 'react-router'
+import characterPageBg from 'assets/images/characterPageBg.jpg'
+import { Container, Episodes, GenderBadge } from './CharacterPage.styles'
+import CharacterPagePlaceholder from './CharacterPagePlaceholder'
+import Loading from 'components/Loading'
 
 interface IParams {
   id: string
@@ -14,10 +19,11 @@ interface IParams {
 const CharacterPage = () => {
   const { id } = useParams<IParams>()
   const dispatch = useAppDispatch()
-  const { character, episodes } = useAppSelector((state) => state.characterReducer)
+  const { character, episodes, loadingCharacter, loadingEpisodes } = useAppSelector(
+    (state) => state.characterReducer
+  )
 
   React.useEffect(() => {
-    dispatch(resetCharacterPageState())
     return () => {
       dispatch(resetCharacterPageState())
     }
@@ -39,16 +45,32 @@ const CharacterPage = () => {
   }, [character, dispatch])
 
   return (
-    <div>
-      <div>Character: {character?.name}</div>
-      <br />
-      <div>Episodes:</div>
-      <ol>
-        {episodes.map((episode) => (
-          <li key={episode.id}>{episode.name}</li>
-        ))}
-      </ol>
-    </div>
+    <PageBackground url={characterPageBg}>
+      {character && (
+        <Container>
+          <img src={character.image} alt={character.name} />
+          <span>{character.name}</span>
+          <span>Status: {character?.status}</span>
+          <span>
+            Gender:{' '}
+            <GenderBadge className={character.gender.toLowerCase()}>{character.gender}</GenderBadge>
+          </span>
+          <span>Origin: {character.origin.name}</span>
+          <span>Location: {character.location.name}</span>
+
+          <Episodes>
+            <span>Episodes</span>
+            <ul>
+              {episodes.map((episode) => (
+                <li key={episode.id}>{episode.name}</li>
+              ))}
+            </ul>
+            {loadingEpisodes && <Loading />}
+          </Episodes>
+        </Container>
+      )}
+      {loadingCharacter && <CharacterPagePlaceholder />}
+    </PageBackground>
   )
 }
 

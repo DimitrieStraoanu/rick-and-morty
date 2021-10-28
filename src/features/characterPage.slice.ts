@@ -6,7 +6,8 @@ const namespace = 'character'
 const initialState: ICharacterPageInitialState = {
   character: null,
   episodes: [],
-  loading: true,
+  loadingCharacter: true,
+  loadingEpisodes: true,
 }
 
 interface IFetchCharacterByIdData {
@@ -41,31 +42,32 @@ const characterPage = createSlice({
     resetCharacterPageState: (state) => {
       state.character = initialState.character
       state.episodes = initialState.episodes
-      state.loading = initialState.loading
+      state.loadingCharacter = initialState.loadingCharacter
+      state.loadingEpisodes = initialState.loadingEpisodes
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCharacterById.fulfilled, (state, action) => {
         state.character = action.payload
-        state.loading = false
+        state.loadingCharacter = false
       })
       .addCase(fetchCharacterById.pending, (state, action) => {
-        state.loading = true
+        state.loadingCharacter = true
       })
       .addCase(fetchCharacterById.rejected, (state, action) => {
-        state.loading = false
+        state.loadingCharacter = false
       })
       .addCase(fetchEpisodes.fulfilled, (state, action) => {
         if (Array.isArray(action.payload)) state.episodes = action.payload
         else state.episodes = [action.payload]
-        state.loading = false
+        state.loadingEpisodes = false
       })
       .addCase(fetchEpisodes.pending, (state, action) => {
-        state.loading = true
+        state.loadingEpisodes = true
       })
       .addCase(fetchEpisodes.rejected, (state, action) => {
-        state.loading = false
+        state.loadingEpisodes = false
       })
   },
 })

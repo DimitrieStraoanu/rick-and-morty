@@ -3,18 +3,39 @@ import React from 'react'
 import SearchBar from 'components/SearchBar'
 import StatusSelector from 'components/StatusSelector'
 import { CharacterStatus } from 'features/characterPage.interface'
-import { fetchCharacters, resetHomepageState } from 'features/homepage.slice'
+import {
+  fetchCharacters,
+  resetHomepageState,
+  setSearchQuery,
+  setCharacterStatus,
+  setPage,
+} from 'features/homepage.slice'
 import { useHistory } from 'react-router'
 import Character from 'components/Character'
-import { CharactersContainer, Container, FiltersContainer, PageBackground } from './Homepage.styles'
+import {
+  CharactersContainer,
+  Container,
+  Counter,
+  FiltersContainer,
+  Pagination,
+  PaginationBtn,
+} from './Homepage.styles'
 import homepageBg from 'assets/images/homepageBg.jpg'
+import PageBackground from 'components/PageBackground'
+import CharacterPlaceholder from 'components/Character/CharacterPlaceholder'
+import { ArrowIcon } from 'assets/svg'
 
 const Homepage = () => {
   const history = useHistory()
   const dispatch = useAppDispatch()
-  const { charactersList } = useAppSelector((store) => store.homepageReducer)
-  const [searchQuery, setSearchQuery] = React.useState('')
-  const [characterStatus, setCharacterStatus] = React.useState(CharacterStatus.ALL)
+  const {
+    searchQuery,
+    characterStatus,
+    charactersList,
+    loading,
+    page,
+    pagination: { count, pages },
+  } = useAppSelector((store) => store.homepageReducer)
   const timeoutID = React.useRef<NodeJS.Timeout>()
 
   const debounce = React.useCallback((fn: Function) => {
@@ -23,24 +44,34 @@ const Homepage = () => {
   }, [])
 
   React.useEffect(() => {
-    dispatch(resetHomepageState())
     return () => {
       dispatch(resetHomepageState())
     }
   }, [dispatch])
 
   React.useEffect(() => {
-    dispatch(fetchCharacters({ searchQuery, characterStatus }))
-  }, [dispatch, searchQuery, characterStatus])
+    dispatch(fetchCharacters())
+  }, [dispatch])
 
-  const handleSearch = (value: string): void => {
-    debounce(() => {
-      setSearchQuery(value)
-    })
+  const handleQueryChange = (value: string): void => {
+    dispatch(setPage(1))
+    dispatch(setSearchQuery(value))
+    debounce(() => dispatch(fetchCharacters()))
   }
 
-  const handleClick = (id: number) => (): void => {
+  const handleStatusChange = (value: CharacterStatus): void => {
+    dispatch(setPage(1))
+    dispatch(setCharacterStatus(value))
+    dispatch(fetchCharacters())
+  }
+
+  const handleCharacterClick = (id: number) => (): void => {
     history.push(`/character/${id}`)
+  }
+
+  const handlePageChange = (direction: number) => (): void => {
+    dispatch(setPage(page + direction))
+    dispatch(fetchCharacters())
   }
 
   return (
@@ -48,18 +79,45 @@ const Homepage = () => {
       <Container>
         <FiltersContainer>
           <div>
-            <SearchBar onChange={(value) => handleSearch(value)} />
-            <StatusSelector onChange={(value) => setCharacterStatus(value as CharacterStatus)} />
+            <SearchBar value={searchQuery} onChange={(value) => handleQueryChange(value)} />
+            <StatusSelector
+              value={characterStatus}
+              onChange={(value) => handleStatusChange(value as CharacterStatus)}
+            />
           </div>
         </FiltersContainer>
+
+        <Pagination>
+          <PaginationBtn onClick={handlePageChange(-1)} disabled={page === 1 || !pages || loading}>
+            <ArrowIcon style={{ transform: 'rotate(-90deg)' }} /> <span>Prev</span>
+          </PaginationBtn>
+          <Counter>
+            <span>Characters {count}</span>
+            <span>|</span>
+            <span>
+              Page {page} of {pages}
+            </span>
+          </Counter>
+          <PaginationBtn
+            onClick={handlePageChange(1)}
+            disabled={page === pages || !pages || loading}
+          >
+            <span>Next</span> <ArrowIcon style={{ transform: 'rotate(90deg)' }} />
+          </PaginationBtn>
+        </Pagination>
+
         <CharactersContainer>
           {charactersList.map((character) => (
             <Character
               key={character.id}
               character={character}
-              onClick={handleClick(character.id)}
+              onClick={handleCharacterClick(character.id)}
             />
           ))}
+          {loading &&
+            Array(20)
+              .fill(0)
+              .map((_, index) => <CharacterPlaceholder key={index} />)}
         </CharactersContainer>
       </Container>
     </PageBackground>

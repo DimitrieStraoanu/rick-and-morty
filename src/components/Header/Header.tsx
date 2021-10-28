@@ -1,11 +1,11 @@
 import React from 'react'
-import logo from 'assets/images/logo.webp'
-import { Container, Logo } from './Header.styles'
+import { Container } from './Header.styles'
+import { Logo } from 'assets/svg'
 
 const Header = () => {
   return (
     <Container>
-      <Logo src={logo} alt="Rick and Morty" />
+      <Logo />
     </Container>
   )
 }
