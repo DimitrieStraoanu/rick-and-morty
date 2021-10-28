@@ -24,13 +24,11 @@ const CharacterPage = () => {
   )
 
   React.useEffect(() => {
+    dispatch(fetchCharacterById({ id }))
+
     return () => {
       dispatch(resetCharacterPageState())
     }
-  }, [dispatch])
-
-  React.useEffect(() => {
-    dispatch(fetchCharacterById({ id }))
   }, [dispatch, id])
 
   React.useEffect(() => {

@@ -44,13 +44,10 @@ const Homepage = () => {
   }, [])
 
   React.useEffect(() => {
+    dispatch(fetchCharacters())
     return () => {
       dispatch(resetHomepageState())
     }
-  }, [dispatch])
-
-  React.useEffect(() => {
-    dispatch(fetchCharacters())
   }, [dispatch])
 
   const handleQueryChange = (value: string): void => {
